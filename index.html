@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minimal Store</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans antialiased min-h-screen flex flex-col justify-between">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 px-6 py-4 flex justify-between items-center">
+    <a href="#" class="text-lg font-bold tracking-tight">MINIMAL.</a>
+    <button onclick="toggleCart()" class="relative text-sm font-medium hover:text-gray-600 transition cursor-pointer flex items-center gap-1">
+      Cart 
+      <span class="bg-black text-white text-xs w-5 h-5 rounded-full flex items-center justify-center" id="cart-count">0</span>
+    </button>
+  </header>
+
+  <!-- Product Catalog -->
+  <main class="max-w-5xl mx-auto px-6 py-12 flex-grow w-full">
+    <div class="mb-8">
+      <h2 class="text-2xl font-semibold tracking-tight">Featured Collection</h2>
+      <p class="text-gray-500 text-sm mt-1">Simple, functional objects designed for daily life.</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Product 1 -->
+      <div class="group bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between">
+        <div>
+          <div class="h-56 bg-gray-100 flex items-center justify-center text-gray-400 group-hover:bg-gray-200 transition">
+            <span class="text-sm font-medium">Lamp Image</span>
+          </div>
+          <div class="p-5">
+            <h3 class="font-medium text-gray-900">Minimal Lamp</h3>
+            <p class="text-gray-500 text-sm mt-1">$45.00</p>
+          </div>
+        </div>
+        <div class="p-5 pt-0">
+          <button onclick="addToCart('Minimal Lamp', 45)" class="w-full bg-black text-white py-2.5 rounded-lg text-sm font-medium hover:bg-gray-800 transition cursor-pointer">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+
+      <!-- Product 2 -->
+      <div class="group bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between">
+        <div>
+          <div class="h-56 bg-gray-100 flex items-center justify-center text-gray-400 group-hover:bg-gray-200 transition">
+            <span class="text-sm font-medium">Mug Image</span>
+          </div>
+          <div class="p-5">
+            <h3 class="font-medium text-gray-900">Ceramic Mug</h3>
+            <p class="text-gray-500 text-sm mt-1">$18.00</p>
+          </div>
+        </div>
+        <div class="p-5 pt-0">
+          <button onclick="addToCart('Ceramic Mug', 18)" class="w-full bg-black text-white py-2.5 rounded-lg text-sm font-medium hover:bg-gray-800 transition cursor-pointer">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+
+      <!-- Product 3 -->
+      <div class="group bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between">
+        <div>
+          <div class="h-56 bg-gray-100 flex items-center justify-center text-gray-400 group-hover:bg-gray-200 transition">
+            <span class="text-sm font-medium">Wallet Image</span>
+          </div>
+          <div class="p-5">
+            <h3 class="font-medium text-gray-900">Leather Wallet</h3>
+            <p class="text-gray-500 text-sm mt-1">$60.00</p>
+          </div>
+        </div>
+        <div class="p-5 pt-0">
+          <button onclick="addToCart('Leather Wallet', 60)" class="w-full bg-black text-white py-2.5 rounded-lg text-sm font-medium hover:bg-gray-800 transition cursor-pointer">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-gray-100 py-6 text-center text-xs text-gray-400">
+    &copy; 2026 MINIMAL. All rights reserved.
+  </footer>
+
+  <!-- Cart Slide-over Drawer Backdrop -->
+  <div id="cart-backdrop" onclick="toggleCart()" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300"></div>
+
+  <!-- Cart Drawer -->
+  <div id="cart-drawer" class="fixed inset-y-0 right-0 w-full sm:w-96 bg-white shadow-2xl p-6 transform translate-x-full transition-transform duration-300 flex flex-col justify-between z-50">
+    <div>
+      <div class="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
+        <h2 class="font-bold text-lg">Your Cart</h2>
+        <button onclick="toggleCart()" class="text-gray-400 hover:text-black cursor-pointer text-xl">✕</button>
+      </div>
+      <div id="cart-items" class="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
+        <p class="text-gray-500 text-sm py-8 text-center">Your cart is empty.</p>
+      </div>
+    </div>
+
+    <div class="border-t border-gray-100 pt-4">
+      <div class="flex justify-between font-semibold mb-4 text-base">
+        <span>Total:</span>
+        <span id="cart-total">$0.00</span>
+      </div>
+      <button onclick="checkout()" class="w-full bg-black text-white py-3 rounded-lg text-sm font-medium hover:bg-gray-800 transition cursor-pointer">
+        Proceed to Checkout
+      </button>
+    </div>
+  </div>
+
+  <!-- JavaScript Application Logic -->
+  <script>
+    let cart = [];
+
+    function toggleCart() {
+      const drawer = document.getElementById('cart-drawer');
+      const backdrop = document.getElementById('cart-backdrop');
+      
+      const isOpen = !drawer.classList.contains('translate-x-full');
+
+      if (isOpen) {
+        drawer.classList.add('translate-x-full');
+        backdrop.classList.add('opacity-0');
+        setTimeout(() => backdrop.classList.add('hidden'), 300);
+      } else {
+        backdrop.classList.remove('hidden');
+        setTimeout(() => backdrop.classList.remove('opacity-0'), 10);
+        drawer.classList.remove('translate-x-full');
+      }
+    }
+
+    function addToCart(name, price) {
+      const existingItem = cart.find(i => i.name === name);
+      if (existingItem) {
+        existingItem.qty++;
+      } else {
+        cart.push({ name, price, qty: 1 });
+      }
+      updateCartUI();
+      
+      // Automatically open cart when adding an item
+      const drawer = document.getElementById('cart-drawer');
+      if (drawer.classList.contains('translate-x-full')) {
+        toggleCart();
+      }
+    }
+
+    function changeQty(name, amount) {
+      const item = cart.find(i => i.name === name);
+      if (item) {
+        item.qty += amount;
+        if (item.qty <= 0) {
+          cart = cart.filter(i => i.name !== name);
+        }
+      }
+      updateCartUI();
+    }
+
+    function updateCartUI() {
+      const countEl = document.getElementById('cart-count');
+      const itemsEl = document.getElementById('cart-items');
+      const totalEl = document.getElementById('cart-total');
+
+      const totalCount = cart.reduce((sum, i) => sum + i.qty, 0);
+      countEl.innerText = totalCount;
+
+      if (cart.length === 0) {
+        itemsEl.innerHTML = '<p class="text-gray-500 text-sm py-8 text-center">Your cart is empty.</p>';
+        totalEl.innerText = '$0.00';
+        return;
+      }
+
+      let html = '';
+      let totalPrice = 0;
+
+      cart.forEach(item => {
+        const itemTotal = item.price * item.qty;
+        totalPrice += itemTotal;
+        html += `
+          <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+            <div>
+              <h4 class="font-medium text-sm text-gray-900">${item.name}</h4>
+              <p class="text-xs text-gray-500 mt-0.5">$${item.price} each</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="flex items-center border border-gray-200 bg-white rounded overflow-hidden">
+                <button onclick="changeQty('${item.name}', -1)" class="px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-100 cursor-pointer">-</button>
+                <span class="px-2 text-xs font-medium">${item.qty}</span>
+                <button onclick="changeQty('${item.name}', 1)" class="px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-100 cursor-pointer">+</button>
+              </div>
+              <span class="text-sm font-medium w-12 text-right">$${itemTotal}</span>
+            </div>
+          </div>
+        `;
+      });
+
+      itemsEl.innerHTML = html;
+      totalEl.innerText = `$${totalPrice.toFixed(2)}`;
+    }
+
+    function checkout() {
+      if (cart.length === 0) {
+        alert('Your cart is empty!');
+        return;
+      }
+      alert('Thank you for your order! Checkout simulated successfully.');
+      cart = [];
+      updateCartUI();
+      toggleCart();
+    }
+  </script>
+
+</body>
+</html>
