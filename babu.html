@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minimal Store</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+  <!-- Header -->
+  <header class="flex justify-between items-center p-6 bg-white border-b sticky top-0 z-10">
+    <h1 class="text-xl font-bold tracking-tight">MINIMAL.</h1>
+    <button onclick="toggleCart()" class="text-sm font-medium hover:underline">
+      Cart (<span id="cart-count">0</span>)
+    </button>
+  </header>
+
+  <!-- Product Grid -->
+  <main class="max-w-4xl mx-auto p-6 grid grid-cols-1 sm:grid-cols-3 gap-6">
+    <div class="bg-white p-4 rounded border flex flex-col justify-between">
+      <div>
+        <div class="h-40 bg-gray-100 rounded mb-4 flex items-center justify-center text-gray-400">Image</div>
+        <h2 class="font-medium">Minimal Lamp</h2>
+        <p class="text-gray-500 text-sm">$45.00</p>
+      </div>
+      <button onclick="addToCart('Minimal Lamp', 45)" class="mt-4 bg-black text-white py-2 rounded text-sm hover:bg-gray-800">Add to Cart</button>
+    </div>
+
+    <div class="bg-white p-4 rounded border flex flex-col justify-between">
+      <div>
+        <div class="h-40 bg-gray-100 rounded mb-4 flex items-center justify-center text-gray-400">Image</div>
+        <h2 class="font-medium">Ceramic Mug</h2>
+        <p class="text-gray-500 text-sm">$18.00</p>
+      </div>
+      <button onclick="addToCart('Ceramic Mug', 18)" class="mt-4 bg-black text-white py-2 rounded text-sm hover:bg-gray-800">Add to Cart</button>
+    </div>
+
+    <div class="bg-white p-4 rounded border flex flex-col justify-between">
+      <div>
+        <div class="h-40 bg-gray-100 rounded mb-4 flex items-center justify-center text-gray-400">Image</div>
+        <h2 class="font-medium">Leather Wallet</h2>
+        <p class="text-gray-500 text-sm">$60.00</p>
+      </div>
+      <button onclick="addToCart('Leather Wallet', 60)" class="mt-4 bg-black text-white py-2 rounded text-sm hover:bg-gray-800">Add to Cart</button>
+    </div>
+  </main>
+
+  <!-- Cart Modal / Drawer -->
+  <div id="cart-drawer" class="fixed inset-y-0 right-0 w-80 bg-white shadow-xl p-6 transform translate-x-full transition-transform duration-300 flex flex-col justify-between z-20">
+    <div>
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="font-bold text-lg">Your Cart</h2>
+        <button onclick="toggleCart()" class="text-gray-500 hover:text-black">✕</button>
+      </div>
+      <div id="cart-items" class="space-y-4 text-sm text-gray-600">
+        <p>Your cart is empty.</p>
+      </div>
+    </div>
+    <div class="border-t pt-4">
+      <div class="flex justify-between font-bold mb-4">
+        <span>Total:</span>
+        <span id="cart-total">$0.00</span>
+      </div>
+      <button onclick="checkout()" class="w-full bg-black text-white py-2 rounded text-sm hover:bg-gray-800">Checkout</button>
+    </div>
+  </div>
+
+  <script>
+    let cart = [];
+
+    function toggleCart() {
+      const drawer = document.getElementById('cart-drawer');
+      drawer.classList.toggle('translate-x-full');
+    }
+
+    function addToCart(name, price) {
+      const item = cart.find(i => i.name === name);
+      if (item) {
+        item.qty++;
+      } else {
+        cart.push({ name, price, qty: 1 });
+      }
+      updateCart();
+      toggleCart();
+    }
+
+    function updateCart() {
+      const countEl = document.getElementById('cart-count');
+      const itemsEl = document.getElementById('cart-items');
+      const totalEl = document.getElementById('cart-total');
+
+      const totalCount = cart.reduce((sum, i) => sum + i.qty, 0);
+      countEl.innerText = totalCount;
+
+      if (cart.length === 0) {
+        itemsEl.innerHTML = '<p>Your cart is empty.</p>';
+        totalEl.innerText = '$0.00';
+        return;
+      }
+
+      let html = '';
+      let totalPrice = 0;
+      cart.forEach(item => {
+        totalPrice += item.price * item.qty;
+        html += `<div class="flex justify-between items-center">
+          <span>${item.name} (x${item.qty})</span>
+          <span>$${item.price * item.qty}</span>
+        </div>`;
+      });
+
+      itemsEl.innerHTML = html;
+      totalEl.innerText = `$${totalPrice}`;
+    }
+
+    function checkout() {
+      if (cart.length === 0) return alert('Cart is empty!');
+      alert('Order placed successfully!');
+      cart = [];
+      updateCart();
+      toggleCart();
+    }
+  </script>
+
+</body>
+</html>
